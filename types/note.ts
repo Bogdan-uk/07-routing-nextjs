@@ -4,8 +4,13 @@ export interface Note {
   id: string;
   title: string;
   content: string;
-  tag: NoteTag;
-
   createdAt: string;
   updatedAt: string;
+  tag: string;
+}
+
+export interface NewNote {
+  title: string;
+  content: string;
+  tag: string;
 }

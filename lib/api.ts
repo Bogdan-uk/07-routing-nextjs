@@ -16,7 +16,7 @@ const api: AxiosInstance = axios.create({
 export interface FetchNotesParams {
   page?: number;
   perPage?: number;
-  search?: string;
+  tagName?: string;
 }
 
 export interface FetchNotesResponse {
@@ -28,6 +28,25 @@ export interface CreateNotePayload {
   title: string;
   content: string;
   tag: string;
+}
+
+export async function fetchNotes(
+  currentPage: number,
+  search?: string,
+  tagName?: string
+): Promise<FetchNotesResponse> {
+  const getParams = {
+    params: {
+      search,
+      page: currentPage,
+      perPage: 12,
+      tag: tagName,
+    },
+  };
+
+  const { data } = await api.get<FetchNotesResponse>('/notes', getParams);
+
+  return data;
 }
 // export async function getTodos() {
 //   const { data } = await axios.get<Todo[]>(
@@ -45,17 +64,7 @@ export async function fetchNoteById(id: string): Promise<Note> {
 //   );
 //   return data;
 // }
-export async function fetchNotes(
-  params: FetchNotesParams
-): Promise<FetchNotesResponse> {
-  const { page = 1, perPage = 12, search = '' } = params;
 
-  const { data } = await api.get<FetchNotesResponse>('/notes', {
-    params: { page, perPage, search: search || undefined },
-  });
-
-  return data;
-}
 export async function createNote(payload: CreateNotePayload): Promise<Note> {
   const response: AxiosResponse<Note> = await api.post('/notes', payload);
   return response.data;

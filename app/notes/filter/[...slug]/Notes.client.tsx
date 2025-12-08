@@ -13,15 +13,9 @@ import css from './Notes.client.module.css';
 
 const PER_PAGE = 12;
 
-export default function NotesClient({
-  initialPage,
-  initialSearch,
-}: {
-  initialPage: number;
-  initialSearch: string;
-}) {
-  const [page, setPage] = useState(initialPage);
-  const [search, setSearch] = useState(initialSearch);
+export default function NotesClient() {
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
   const [debouncedSearch] = useDebounce(search, 400);
   const [isModalOpen, setIsModalOpen] = useState(false);
 

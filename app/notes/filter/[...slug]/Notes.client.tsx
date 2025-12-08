@@ -21,25 +21,30 @@ export const NotesByTagNameClient = ({
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const openModal = useCallback(() => setIsModalOpen(true), []);
   const closeModal = useCallback(() => setIsModalOpen(false), []);
-  const [debouncedSearch] = useDebounce('search', 400);
 
-  const { data, isError, isLoading, error } = useQuery({
-    queryKey: ['notes', tagName, search, currentPage],
-    queryFn: () => fetchNotes(currentPage, search, tagName),
+  const [debouncedSearch] = useDebounce(search, 400);
+
+  const { data, isError, isLoading, isFetching } = useQuery({
+    queryKey: ['notes', tagName, debouncedSearch, currentPage],
+    queryFn: () => fetchNotes(currentPage, debouncedSearch, tagName),
     refetchOnMount: false,
-    enabled: true,
     placeholderData: keepPreviousData,
   });
+
   const handleSearchChange = (val: string) => {
     setSearch(val);
+    setCurrentPage(1);
   };
+
   const totalPages = data?.totalPages ?? 0;
+
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
-        <SearchBox value={''} onChange={handleSearchChange} />
+        <SearchBox value={search} onChange={handleSearchChange} />
 
         {totalPages > 1 && (
           <Pagination
@@ -49,10 +54,15 @@ export const NotesByTagNameClient = ({
           />
         )}
 
-        <button className={css.button} onClick={() => setIsModalOpen(true)}>
+        <button className={css.button} onClick={openModal}>
           Create note +
         </button>
       </header>
+      {isLoading && <p>Loading...</p>}
+      {isError && <p>Something went wrong. Try again.</p>}
+      {!isLoading && !isError && data && data.notes.length > 0 && (
+        <NoteList notes={data.notes} />
+      )}
 
       {isModalOpen && (
         <Modal onClose={closeModal}>
@@ -64,8 +74,7 @@ export const NotesByTagNameClient = ({
           />
         </Modal>
       )}
-
-      {data && data.notes.length > 0 && <NoteList notes={data.notes} />}
+      {isFetching && <p>Updating...</p>}
     </div>
   );
 };

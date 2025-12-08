@@ -19,7 +19,7 @@ export default function NotesClient() {
   const [debouncedSearch] = useDebounce(search, 400);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data, isLoading, isError, refetch, isFetching } = useQuery({
+  const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ['notes', page, debouncedSearch],
     queryFn: () =>
       fetchNotes({ page, perPage: PER_PAGE, search: debouncedSearch }),
@@ -64,7 +64,6 @@ export default function NotesClient() {
           <NoteForm
             onCreated={() => {
               closeModal();
-              refetch();
             }}
             onCancel={closeModal}
           />
